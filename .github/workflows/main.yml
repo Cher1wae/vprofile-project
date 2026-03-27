@@ -75,6 +75,26 @@ jobs:
              VERSION_LABEL=vprofile-$TIMESTAMP
              aws s3 cp target/vprofile-v2.war s3://${{ secrets.S3_BUCKET }}/$VERSION_LABEL.war
              echo "VERSION_LABEL=$VERSION_LABEL" >> $GITHUB_ENV
+
+      - name: Create Beanstalk application version
+        run: |
+          aws elasticbeanstalk create-application-version \
+            --application-name ${{ secrets.EB_APPLICATION_NAME }} \
+            --version-label ${{ env.VERSION_LABEL }} \
+            --source-bundle S3Bucket=${{ secrets.S3_BUCKET }},S3Key=${{ env.VERSION_LABEL }}.war
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Deploy to Beanstalk
+        run: |
+          aws elasticbeanstalk update-environment \
+            --application-name ${{ secrets.EB_APPLICATION_NAME }} \
+            --environment-name ${{ secrets.EB_ENVIRONMENT_NAME }} \
+            --version-label ${{ env.VERSION_LABEL }}
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Deployment complete
+        run: echo "Deployed ${{ env.VERSION_LABEL }} to Beanstalk!"
+
    
 
 
