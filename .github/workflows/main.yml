@@ -82,6 +82,7 @@ jobs:
             --application-name ${{ secrets.EB_APPLICATION_NAME }} \
             --version-label ${{ env.VERSION_LABEL }} \
             --source-bundle S3Bucket=${{ secrets.S3_BUCKET }},S3Key=${{ env.VERSION_LABEL }}.war
+            #forgot to add the region in my in the region secret i created earlier, caused the deployment to fail
             --region ${{ secrets.AWS_REGION }}
 
       - name: Deploy to Beanstalk
